@@ -1,9 +1,12 @@
 # %%
+import cv2
+import cv2.img_hash
 import torch
 import requests
 import Architecture
 from PIL import Image
 from io import BytesIO
+import numpy as np
 from torchvision.transforms import Normalize, Compose, ToTensor
 
 # %%
@@ -23,10 +26,13 @@ print(keys)
 
 # %%
 new_model = Architecture.MTArchitecture().to(device=device)
-new_model.load_state_dict(torch.load(r"models\best_CelebA_0.6479514565891943.pt", map_location=device))
+new_model.load_state_dict(torch.load(
+    r"models\best_CelebA_0.6479514565891943.pt", map_location=device))
 print(new_model)
 
 # %%
+
+
 def Inference_image(Image_path, local):
     if not local:
         response = requests.get(Image_path)
@@ -34,11 +40,11 @@ def Inference_image(Image_path, local):
         image = Image.open(BytesIO(response.content)).convert("RGB")
     else:
         image = Image.open(Image_path).convert("RGB")
-    image = transform(image).unsqueeze(0).to(device)
+    image_tensor = transform(image).unsqueeze(0).to(device)
 
     new_model.eval()
     with torch.no_grad():
-        predictions = new_model(image)
+        predictions = new_model(image_tensor)
         # predictions = [torch.sigmoid(output).item() for output in outputs]
 
     binary_predictions = [1 if prediction >
@@ -47,8 +53,32 @@ def Inference_image(Image_path, local):
     for attr, value in zip(keys, binary_predictions):
         print(f'''{attr}: {"yes" if value == 1 else "No"}''')
 
+    open_cv_image = np.array(image)
+    open_cv_image = cv2.cvtColor(open_cv_image, cv2.COLOR_RGB2BGR)
+
+    # Add predicted attributes as text overlay on the image
+    no_offset = 20
+    yes_offset = 20
+    for attribute, value in zip(keys, binary_predictions):
+        text = f"{attribute}: {'Yes' if value == 1 else 'No'}"
+        if value == 0:
+            cv2.putText(open_cv_image, text, (10, no_offset),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+            no_offset += 15
+        else:
+            cv2.putText(open_cv_image, text, (600, yes_offset),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+            yes_offset += 15
+
+    cv2.imwrite("output.png", open_cv_image)
+
+    # Display the image with predictions
+    cv2.imshow('Predicted Attributes', open_cv_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 
 # %%
-IMAGE = r"C:\Users\smart\Documents\Computer Vision\MultiTask Learning\CelebA\data\celeba\img_align_celeba\000125.jpg"
-img = Inference_image(IMAGE, local=True)
+IMAGE = r"https://img.theweek.in/content/dam/week/magazine/theweek/sports/images/2020/4/23/Sachin-Tendulkar2.jpg"
+img = Inference_image(IMAGE, local=False)
 # %%

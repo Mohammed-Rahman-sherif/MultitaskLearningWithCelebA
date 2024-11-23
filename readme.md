@@ -2,6 +2,8 @@
 
 This project involves a multi-task learning architecture implemented using PyTorch to classify attributes of images from the CelebA dataset. The model is designed to predict 40 binary attributes for each image, using a shared convolutional backbone and separate fully connected heads for each attribute.
 
+![Training and Testing Loss](output.png)
+
 ## Table of Contents
 
 - [Installation](#installation)
@@ -88,7 +90,7 @@ You can visualize the training and validation losses using the generated plot:
 
 ![Training and Testing Loss](plot.png)
 
-![Training and Testing Loss](https://i.pinimg.com/736x/39/56/34/3956343feab920b59d7e58c7940b7d03.jpg)
+![Training and Testing Loss](output.png)
 
 ## Project Structure
 
