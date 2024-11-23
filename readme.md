@@ -18,8 +18,8 @@ This project involves a multi-task learning architecture implemented using PyTor
 Clone this repository and navigate to the project directory:
 
 ```bash
-$ git clone https://github.com/your-repository/celeba-multitask
-$ cd celeba-multitask
+$ git clone https://github.com/Mohammed-Rahman-sherif/MultitaskLearningWithCelebA.git
+$ cd MultitaskLearningWithCelebA
 ```
 
 Install the necessary dependencies using the provided `requirements.txt` file:
@@ -44,7 +44,7 @@ The multi-task learning model is trained to predict 40 different attributes for 
 To train the model, run the following command:
 
 ```bash
-$ python train.py
+$ python src/MultiTask.py
 ```
 
 This will train the model for 10 epochs (you can adjust the number of epochs) and save the best model as `CelebA_best_model.pt`.
